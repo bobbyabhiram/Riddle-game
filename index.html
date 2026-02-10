@@ -8,282 +8,311 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💚</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #0a1a2e 0%, #0d2818 35%, #0a1a2e 65%, #0d2818 100%);
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
-    overflow-x: hidden;
-    font-family: 'Quicksand', sans-serif;
-    color: #fff;
-  }
-  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-  @keyframes floatUp { 0%{transform:translateY(0) rotate(0deg);opacity:0} 10%{opacity:.7} 90%{opacity:.7} 100%{transform:translateY(-100vh) rotate(360deg);opacity:0} }
-  @keyframes confettiFall { 0%{transform:translateY(-10px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
-  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-  @keyframes shimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
-  @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes scaleIn { from{opacity:0;transform:scale(.7)} to{opacity:1;transform:scale(1)} }
-  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
-  input::placeholder { color: rgba(255,255,255,0.35); }
-
-.hearts-bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-.heart-float { position:absolute; bottom:-30px; }
-
-.screen { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px 20px; position:relative; z-index:1; }
-
-.btn-main {
-font-family:‘Quicksand’,sans-serif; font-size:17px; font-weight:700; padding:15px 40px;
-border-radius:50px; border:none; background:linear-gradient(135deg,#7EC8E3,#90EE90);
-color:#1a3a2a; cursor:pointer; box-shadow:0 4px 25px rgba(126,200,227,.4);
-transition:all .3s ease; -webkit-tap-highlight-color:transparent;
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#0a1a2e 0%,#0d2818 35%,#0a1a2e 65%,#0d2818 100%);
+  background-size:400% 400%;
+  animation:gradBG 15s ease infinite;
+  font-family:'Quicksand',sans-serif;
+  color:#fff;
+  overflow-x:hidden;
 }
-.btn-main:active { transform:scale(.96); }
+#app{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px 20px;
+  position:relative;
+  z-index:1;
+}
+.hearts{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.h{position:absolute;bottom:-30px}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden}
+.cf{position:absolute;top:-20px;border-radius:2px}
 
-.game-card {
-background:rgba(255,255,255,.06); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-border-radius:24px; padding:28px 24px; max-width:540px; width:100%;
-border:1px solid rgba(255,255,255,.1); box-shadow:0 8px 40px rgba(0,0,0,.25);
+.btn{
+font-family:‘Quicksand’,sans-serif;font-size:17px;font-weight:700;
+padding:15px 40px;border-radius:50px;border:none;
+background:linear-gradient(135deg,#7EC8E3,#90EE90);
+color:#1a3a2a;cursor:pointer;
+box-shadow:0 4px 25px rgba(126,200,227,.4);
+transition:transform .2s ease;
+-webkit-tap-highlight-color:transparent;
+}
+.btn:active{transform:scale(.95)}
+
+.card{
+background:rgba(255,255,255,.06);
+backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+border-radius:24px;padding:28px 24px;max-width:540px;width:100%;
+border:1px solid rgba(255,255,255,.1);
+box-shadow:0 8px 40px rgba(0,0,0,.25);
 }
 
-.answer-box {
-width:100%; font-family:‘Quicksand’,sans-serif; font-size:16px; padding:14px 20px;
-border-radius:50px; border:2px solid rgba(255,255,255,.2); background:rgba(255,255,255,.1);
-color:#fff; outline:none; transition:border-color .3s ease; -webkit-appearance:none;
+.inp{
+width:100%;font-family:‘Quicksand’,sans-serif;font-size:16px;
+padding:14px 20px;border-radius:50px;
+border:2px solid rgba(255,255,255,.2);
+background:rgba(255,255,255,.1);color:#fff;
+outline:none;-webkit-appearance:none;
 }
-.answer-box:focus { border-color:#7EC8E3; }
+.inp:focus{border-color:#7EC8E3}
+input::placeholder{color:rgba(255,255,255,.35)}
 
-.prog-wrap { display:flex; align-items:center; gap:6px; justify-content:center; margin-bottom:28px; }
-.prog-dot { width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;transition:all .4s ease; }
-.prog-line { width:24px;height:3px;border-radius:2px;transition:all .4s ease; }
+.ridbox{
+background:rgba(126,200,227,.08);border-radius:16px;
+padding:22px;margin:12px 0 22px;
+border:1px solid rgba(126,200,227,.15);
+}
+.hintbox{
+margin-top:14px;padding:14px 18px;
+background:rgba(144,238,144,.08);border-radius:12px;
+border:1px solid rgba(144,238,144,.15);
+}
+.pbar{display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:28px}
+.pd{
+width:34px;height:34px;border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+font-size:14px;font-weight:700;
+}
+.pl{width:24px;height:3px;border-radius:2px}
 
-.shimmer-title {
-font-family:‘Playfair Display’,serif; font-weight:700;
-background:linear-gradient(135deg,#7EC8E3,#90EE90,#7EC8E3); background-size:200% auto;
--webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-animation:shimmer 3s linear infinite;
-}
-.big-proposal {
-font-family:‘Playfair Display’,serif; font-size:clamp(30px,7vw,52px); font-weight:700;
-background:linear-gradient(135deg,#7EC8E3,#90EE90,#FFD700,#90EE90,#7EC8E3); background-size:300% auto;
--webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-animation:shimmer 3s linear infinite; line-height:1.3;
-}
-.confetti-wrap { position:fixed; inset:0; pointer-events:none; z-index:100; overflow:hidden; }
-.conf-piece { position:absolute; top:-20px; border-radius:2px; }
+@keyframes gradBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes floatUp{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.7}90%{opacity:.7}100%{transform:translateY(-100vh) rotate(360deg);opacity:0}}
+@keyframes confFall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 </style>
 
 </head>
 <body>
 
-<div class="hearts-bg" id="heartsBg"></div>
-
-<!-- WELCOME -->
-
-<div class="screen" id="scrWelcome" style="animation:fadeInUp 1s ease">
-  <div style="font-size:60px;margin-bottom:20px;animation:pulse 2s ease-in-out infinite">💌</div>
-  <h1 class="shimmer-title" style="font-size:clamp(28px,6vw,48px);margin-bottom:14px;line-height:1.2">Hey Lipi! 💚</h1>
-  <p style="font-size:clamp(16px,3vw,20px);color:rgba(255,255,255,.85);max-width:480px;line-height:1.7;margin-bottom:10px">I've hidden something special for you in this little adventure...</p>
-  <p style="font-size:clamp(14px,2.5vw,17px);color:rgba(255,255,255,.55);max-width:430px;line-height:1.6;margin-bottom:35px">Solve the riddles, relive our memories, and find the surprise waiting at the end. Are you ready? 🕵️‍♀️</p>
-  <button class="btn-main" style="font-size:18px;padding:16px 48px" onclick="beginGame()">Begin Our Adventure ✨</button>
-  <p style="margin-top:40px;font-size:13px;color:rgba(255,255,255,.3);font-style:italic">Made with all my love — Abhi 💚</p>
-</div>
-
-<!-- GAME -->
-
-<div class="screen" id="scrGame" style="display:none">
-  <div class="prog-wrap" id="progBar"></div>
-  <div class="game-card" id="gameCard"></div>
-</div>
-
-<!-- PROPOSAL -->
-
-<div class="screen" id="scrProposal" style="display:none">
-  <div class="confetti-wrap" id="confettiBox"></div>
-  <div id="proposalContent"></div>
-</div>
+<div class="hearts" id="hBg"></div>
+<div id="app"></div>
 
 <script>
-var STOPS = [
-  { emoji:"🌅", title:"Where It All Began", date:"September 28 • 10:00 AM",
-    story:"Every love story has a beginning. Ours started in a city blessed by the mighty Godavari, on a September morning when the universe decided two hearts should meet...",
-    riddle:"In a city where the Godavari flows wide,\nOn a September morning, our paths first collided.\nThe clock struck ten, the 28th day —\nName the city where our love story began to play! 🌊",
-    answers:["rajahmundry","rajamahendravaram","rajamundry","rajamahendri"],
-    hint:"It's a beautiful city in Andhra Pradesh, famous for its bridge over the Godavari river...",
-    success:"Yes! 💚 Rajahmundry! That magical morning changed everything. Who knew 10 AM could be the most important time of my life?" },
-  { emoji:"🏠", title:"Our Little World", date:"October 29",
-    story:"Sometimes the most precious moments don't happen at fancy places. They happen in quiet spaces, where it's just you and me, and the world fades away...",
-    riddle:"No restaurant, no park in sight,\nJust us together — everything felt right.\nOctober 29th, behind a familiar door,\nA private world where our hearts began to soar.\n\nWhat was this cozy place where we made memories so dear? 🔑",
-    answers:["home","your home","house","your house"],
-    hint:"Think of the coziest, most private place... where only we existed that day 💕",
-    success:"That's right! 🏠 Your home became OUR little universe that day. Just us, no distractions — pure magic. That's when I knew this was real." },
-  { emoji:"🍽️", title:"Our First Real Date", date:"November 5",
-    story:"After weeks of stolen glances and butterflies, we finally made it official — our first proper date! I remember every detail like it was yesterday...",
-    riddle:"November the fifth, hearts beating fast,\nOur first official date — a memory to last!\nA place whose name sounds like 'shelter' with a twist,\nA hotel where our love couldn't be missed.\n\nWhere did we share that special evening? 🌟",
-    answers:["shelton","shelton hotel","hotel shelton","the shelton"],
-    hint:"It rhymes with 'melton'... and it's a hotel where we had our first date! 🏨",
-    success:"SHELTON HOTEL! 🎉 Our first official date! I was so nervous, but the moment I saw you, everything just clicked. Best. Date. Ever." },
-  { emoji:"💍", title:"The Day We Said Forever", date:"November 8",
-    story:"From strangers in September to soulmates by November. In just 41 days, I found my forever person. And on November 8th, we made it official...",
-    riddle:"From the banks of Godavari to this very moment,\nEvery second with you has been golden.\nNovember 8th sealed what our hearts always knew —\n\nWhat happened on that beautiful day between me and you? 💎",
-    answers:["engaged","engagement","we got engaged","got engaged","officially engaged","propose","proposal"],
-    hint:"It's something that happens when two people decide to spend forever together... 💍",
-    success:"We got ENGAGED! 💍✨ The best decision of my life..." }
+var DATA=[
+  {emoji:"🌅",title:"Where It All Began",date:"September 28 • 10:00 AM",
+   story:"Every love story has a beginning. Ours started in a city blessed by the mighty Godavari, on a September morning when the universe decided two hearts should meet...",
+   riddle:"In a city where the Godavari flows wide,\nOn a September morning, our paths first collided.\nThe clock struck ten, the 28th day —\nName the city where our love story began to play! 🌊",
+   ans:["rajahmundry","rajamahendravaram","rajamundry","rajamahendri"],
+   hint:"It's a beautiful city in Andhra Pradesh, famous for its bridge over the Godavari river...",
+   yay:"Yes! 💚 Rajahmundry! That magical morning changed everything. Who knew 10 AM could be the most important time of my life?"},
+
+  {emoji:"🏠",title:"Our Little World",date:"October 29",
+   story:"Sometimes the most precious moments don't happen at fancy places. They happen in quiet spaces, where it's just you and me, and the world fades away...",
+   riddle:"No restaurant, no park in sight,\nJust us together — everything felt right.\nOctober 29th, behind a familiar door,\nA private world where our hearts began to soar.\n\nWhat was this cozy place where we made memories so dear? 🔑",
+   ans:["home","your home","house","your house"],
+   hint:"Think of the coziest, most private place... where only we existed that day 💕",
+   yay:"That's right! 🏠 Your home became OUR little universe that day. Just us, no distractions — pure magic. That's when I knew this was real."},
+
+  {emoji:"🍽️",title:"Our First Real Date",date:"November 5",
+   story:"After weeks of stolen glances and butterflies, we finally made it official — our first proper date! I remember every detail like it was yesterday...",
+   riddle:"November the fifth, hearts beating fast,\nOur first official date — a memory to last!\nA place whose name sounds like 'shelter' with a twist,\nA hotel where our love couldn't be missed.\n\nWhere did we share that special evening? 🌟",
+   ans:["shelton","shelton hotel","hotel shelton","the shelton"],
+   hint:"It rhymes with 'melton'... and it's a hotel where we had our first date! 🏨",
+   yay:"SHELTON HOTEL! 🎉 Our first official date! I was so nervous, but the moment I saw you, everything just clicked. Best. Date. Ever."},
+
+  {emoji:"💍",title:"The Day We Said Forever",date:"November 8",
+   story:"From strangers in September to soulmates by November. In just 41 days, I found my forever person. And on November 8th, we made it official...",
+   riddle:"From the banks of Godavari to this very moment,\nEvery second with you has been golden.\nNovember 8th sealed what our hearts always knew —\n\nWhat happened on that beautiful day between me and you? 💎",
+   ans:["engaged","engagement","we got engaged","got engaged","officially engaged","propose","proposal"],
+   hint:"It's something that happens when two people decide to spend forever together... 💍",
+   yay:"We got ENGAGED! 💍✨ The best decision of my life..."}
 ];
 
-var curStop = 0;
+var state={screen:"welcome",stop:0,phase:"story",hintOn:false,wrongOn:false};
 
 // Hearts
 (function(){
-  var c=document.getElementById('heartsBg');
+  var c=document.getElementById('hBg');
   for(var i=0;i<18;i++){
-    var h=document.createElement('div');
-    h.className='heart-float';
-    h.textContent='💚';
-    h.style.left=(Math.random()*100)+'%';
-    h.style.fontSize=(12+Math.random()*18)+'px';
-    h.style.opacity=.3+Math.random()*.4;
-    h.style.animation='floatUp '+(3+Math.random()*4)+'s ease-in '+(Math.random()*6)+'s infinite';
-    c.appendChild(h);
+    var d=document.createElement('div');d.className='h';d.textContent='💚';
+    d.style.cssText='left:'+(Math.random()*100)+'%;font-size:'+(12+Math.random()*18)+'px;opacity:'+(0.3+Math.random()*0.4)+';animation:floatUp '+(3+Math.random()*4)+'s ease-in '+(Math.random()*6)+'s infinite';
+    c.appendChild(d);
   }
 })();
 
-function showOnly(id){
-  document.getElementById('scrWelcome').style.display='none';
-  document.getElementById('scrGame').style.display='none';
-  document.getElementById('scrProposal').style.display='none';
-  document.getElementById(id).style.display='flex';
+function render(){
+  var app=document.getElementById('app');
   window.scrollTo(0,0);
-}
 
-function drawProgress(){
-  var bar=document.getElementById('progBar');
-  bar.innerHTML='';
-  for(var i=0;i<STOPS.length;i++){
-    var d=document.createElement('div');
-    d.className='prog-dot';
-    if(i<curStop){d.style.background='linear-gradient(135deg,#7EC8E3,#90EE90)';d.style.color='#1a5c3a';d.style.boxShadow='0 2px 10px rgba(126,200,227,.4)';d.textContent='✓';}
-    else if(i===curStop){d.style.background='#fff';d.style.color='#1a5c3a';d.style.border='2px solid #90EE90';d.textContent=STOPS[i].emoji;}
-    else{d.style.background='rgba(255,255,255,.15)';d.style.color='rgba(255,255,255,.4)';d.textContent=STOPS[i].emoji;}
-    bar.appendChild(d);
-    if(i<STOPS.length-1){var l=document.createElement('div');l.className='prog-line';l.style.background=i<curStop?'linear-gradient(90deg,#7EC8E3,#90EE90)':'rgba(255,255,255,.12)';bar.appendChild(l);}
+  if(state.screen==="welcome"){
+    app.innerHTML=
+      '<div style="font-size:60px;margin-bottom:20px;animation:pulse 2s ease-in-out infinite">💌</div>'+
+      '<h1 style="font-family:Playfair Display,serif;font-size:clamp(28px,6vw,48px);font-weight:700;background:linear-gradient(135deg,#7EC8E3,#90EE90,#7EC8E3);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite;margin-bottom:14px;line-height:1.2">Hey Lipi! 💚</h1>'+
+      '<p style="font-size:clamp(16px,3vw,20px);color:rgba(255,255,255,.85);max-width:480px;line-height:1.7;margin-bottom:10px">I\'ve hidden something special for you in this little adventure...</p>'+
+      '<p style="font-size:clamp(14px,2.5vw,17px);color:rgba(255,255,255,.55);max-width:430px;line-height:1.6;margin-bottom:35px">Solve the riddles, relive our memories, and find the surprise waiting at the end. Are you ready? 🕵️‍♀️</p>'+
+      '<button class="btn" style="font-size:18px;padding:16px 48px" onclick="go(\'start\')">Begin Our Adventure ✨</button>'+
+      '<p style="margin-top:40px;font-size:13px;color:rgba(255,255,255,.3);font-style:italic">Made with all my love — Abhi 💚</p>';
+    return;
+  }
+
+  if(state.screen==="game"){
+    var s=DATA[state.stop];
+    var html='';
+
+    // Progress bar
+    html+='<div class="pbar">';
+    for(var i=0;i<DATA.length;i++){
+      var bg,clr,bdr='',shd='',txt;
+      if(i<state.stop){bg='linear-gradient(135deg,#7EC8E3,#90EE90)';clr='#1a5c3a';shd='box-shadow:0 2px 10px rgba(126,200,227,.4);';txt='✓';}
+      else if(i===state.stop){bg='#fff';clr='#1a5c3a';bdr='border:2px solid #90EE90;';txt=DATA[i].emoji;}
+      else{bg='rgba(255,255,255,.15)';clr='rgba(255,255,255,.4)';txt=DATA[i].emoji;}
+      html+='<div class="pd" style="background:'+bg+';color:'+clr+';'+bdr+shd+'">'+txt+'</div>';
+      if(i<DATA.length-1){
+        var lbg=i<state.stop?'linear-gradient(90deg,#7EC8E3,#90EE90)':'rgba(255,255,255,.12)';
+        html+='<div class="pl" style="background:'+lbg+'"></div>';
+      }
+    }
+    html+='</div>';
+
+    // Card
+    html+='<div class="card" style="animation:fadeIn .6s ease">';
+    html+='<div style="text-align:center;margin-bottom:18px"><div style="font-size:40px">'+s.emoji+'</div>';
+    html+='<h2 style="font-family:Playfair Display,serif;font-size:clamp(20px,4vw,28px);font-weight:700;margin:8px 0 4px">Stop '+(state.stop+1)+': '+s.title+'</h2>';
+    html+='<p style="font-size:14px;color:#90EE90;font-weight:600">'+s.date+'</p></div>';
+
+    if(state.phase==="story"){
+      html+='<p style="font-size:16px;color:rgba(255,255,255,.8);line-height:1.8;text-align:center;font-style:italic;margin:16px 0 28px">'+s.story+'</p>';
+      html+='<div style="text-align:center"><button class="btn" onclick="go(\'riddle\')">Show Me The Riddle! 🔍</button></div>';
+    }
+
+    if(state.phase==="riddle"){
+      html+='<div class="ridbox">';
+      html+='<p style="font-size:12px;color:#7EC8E3;font-weight:700;margin-bottom:10px;letter-spacing:2px">🧩 RIDDLE</p>';
+      html+='<p style="font-family:Playfair Display,serif;font-size:clamp(15px,3vw,18px);color:rgba(255,255,255,.9);line-height:1.9;white-space:pre-line">'+s.riddle+'</p>';
+      html+='</div>';
+      html+='<div style="display:flex;gap:10px;flex-wrap:wrap">';
+      html+='<input type="text" id="ansInp" class="inp" placeholder="Type your answer..." />';
+      html+='<button class="btn" style="padding:14px 28px" onclick="go(\'check\')">Check ✨</button>';
+      html+='</div>';
+      if(state.wrongOn){
+        html+='<p style="color:#ff9999;font-size:14px;margin-top:12px;text-align:center">Hmm, not quite! Try again, baby 😘</p>';
+      }
+      if(!state.hintOn){
+        html+='<p style="color:rgba(255,255,255,.4);font-size:13px;margin-top:16px;text-align:center;cursor:pointer;text-decoration:underline" onclick="go(\'hint\')">Need a hint? 👀</p>';
+      } else {
+        html+='<div class="hintbox"><p style="color:#90EE90;font-size:14px;margin:0">💡 '+s.hint+'</p></div>';
+      }
+    }
+
+    if(state.phase==="solved"){
+      var nxt=state.stop<DATA.length-1?'Next Stop →':"See What's Next... 💍";
+      html+='<div style="text-align:center;animation:fadeIn .6s ease">';
+      html+='<div style="font-size:50px;margin:10px 0;animation:scaleIn .6s ease">🎉</div>';
+      html+='<p style="font-size:17px;color:#90EE90;line-height:1.8;margin:14px 0 26px;font-weight:600">'+s.yay+'</p>';
+      html+='<button class="btn" onclick="go(\'next\')">'+nxt+'</button>';
+      html+='</div>';
+    }
+
+    html+='</div>';
+    app.innerHTML=html;
+
+    // Focus input if riddle phase
+    if(state.phase==="riddle"){
+      var inp=document.getElementById('ansInp');
+      if(inp) setTimeout(function(){inp.focus();},100);
+    }
+    return;
+  }
+
+  if(state.screen==="proposal"){
+    app.innerHTML=
+      '<div class="confetti" id="confBox"></div>'+
+      '<p id="pL0" style="font-family:Playfair Display,serif;font-size:clamp(16px,3.5vw,22px);color:rgba(255,255,255,.85);line-height:1.8;max-width:580px;margin-bottom:16px;opacity:0;transition:opacity 1s ease,transform 1s ease;transform:translateY(15px)">From that September morning in Rajahmundry...</p>'+
+      '<p id="pL1" style="font-family:Playfair Display,serif;font-size:clamp(16px,3.5vw,22px);color:rgba(255,255,255,.85);line-height:1.8;max-width:580px;margin-bottom:16px;opacity:0;transition:opacity 1s ease,transform 1s ease;transform:translateY(15px)">To every stolen moment, every laugh, every look...</p>'+
+      '<p id="pL2" style="font-family:Playfair Display,serif;font-size:clamp(16px,3.5vw,22px);color:rgba(255,255,255,.85);line-height:1.8;max-width:580px;margin-bottom:16px;opacity:0;transition:opacity 1s ease,transform 1s ease;transform:translateY(15px)">You became my favorite person in the universe.</p>'+
+      '<div id="bigR" style="opacity:0;transform:scale(.8);transition:opacity 1.2s ease,transform 1.2s ease;margin-top:24px">'+
+        '<div style="font-size:70px;margin-bottom:20px;animation:pulse 1.5s ease-in-out infinite">💍</div>'+
+        '<h1 style="font-family:Playfair Display,serif;font-size:clamp(30px,7vw,52px);font-weight:700;background:linear-gradient(135deg,#7EC8E3,#90EE90,#FFD700,#90EE90,#7EC8E3);background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite;line-height:1.3">Lipi, Will You Marry Me?</h1>'+
+        '<p style="font-size:clamp(15px,3vw,19px);color:rgba(255,255,255,.7);margin-top:18px;line-height:1.7;max-width:480px">You are my September surprise, my October warmth,<br>my November forever, and my every day after.</p>'+
+        '<p style="margin-top:40px;font-size:22px;color:#FFD700;font-weight:700;animation:pulse 2s ease-in-out infinite">Happy Valentine\'s Day, My Love! 💚</p>'+
+        '<p style="margin-top:30px;font-size:14px;color:rgba(255,255,255,.35);font-style:italic">Forever yours — Abhi 💚</p>'+
+      '</div>';
+
+    // Confetti
+    var cb=document.getElementById('confBox');
+    var cols=['#7EC8E3','#90EE90','#FFD700','#FF69B4','#E0F7FA','#C8E6C9','#FFF9C4','#F8BBD0'];
+    for(var i=0;i<80;i++){
+      var p=document.createElement('div');p.className='cf';
+      p.style.cssText='left:'+(Math.random()*100)+'%;width:'+(6+Math.random()*8)+'px;height:'+(9+Math.random()*12)+'px;background-color:'+cols[i%cols.length]+';transform:rotate('+(Math.random()*360)+'deg);animation:confFall '+(2+Math.random()*3)+'s ease-in '+(Math.random()*3)+'s infinite';
+      cb.appendChild(p);
+    }
+
+    // Timed reveals
+    setTimeout(function(){var e=document.getElementById('pL0');if(e){e.style.opacity='1';e.style.transform='translateY(0)';}},500);
+    setTimeout(function(){var e=document.getElementById('pL1');if(e){e.style.opacity='1';e.style.transform='translateY(0)';}},2500);
+    setTimeout(function(){var e=document.getElementById('pL2');if(e){e.style.opacity='1';e.style.transform='translateY(0)';}},4500);
+    setTimeout(function(){var e=document.getElementById('bigR');if(e){e.style.opacity='1';e.style.transform='scale(1)';}},7000);
   }
 }
 
-function renderStop(){
-  var s=STOPS[curStop];
-  var nextLabel=curStop<STOPS.length-1?'Next Stop →':"See What's Next... 💍";
-  var card=document.getElementById('gameCard');
-
-  card.innerHTML=
-    '<div style="text-align:center;margin-bottom:18px">'+
-      '<div style="font-size:40px">'+s.emoji+'</div>'+
-      '<h2 style="font-family:Playfair Display,serif;font-size:clamp(20px,4vw,28px);font-weight:700;margin:8px 0 4px">Stop '+(curStop+1)+': '+s.title+'</h2>'+
-      '<p style="font-size:14px;color:#90EE90;font-weight:600">'+s.date+'</p>'+
-    '</div>'+
-
-    '<div id="phStory">'+
-      '<p style="font-size:16px;color:rgba(255,255,255,.8);line-height:1.8;text-align:center;font-style:italic;margin:16px 0 28px">'+s.story+'</p>'+
-      '<div style="text-align:center"><button class="btn-main" onclick="toRiddle()">Show Me The Riddle! 🔍</button></div>'+
-    '</div>'+
-
-    '<div id="phRiddle" style="display:none">'+
-      '<div style="background:rgba(126,200,227,.08);border-radius:16px;padding:22px;margin:12px 0 22px;border:1px solid rgba(126,200,227,.15)">'+
-        '<p style="font-size:12px;color:#7EC8E3;font-weight:700;margin-bottom:10px;letter-spacing:2px">🧩 RIDDLE</p>'+
-        '<p style="font-family:Playfair Display,serif;font-size:clamp(15px,3vw,18px);color:rgba(255,255,255,.9);line-height:1.9;white-space:pre-line">'+s.riddle+'</p>'+
-      '</div>'+
-      '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
-        '<input type="text" id="ansInp" class="answer-box" placeholder="Type your answer..." />'+
-        '<button class="btn-main" style="padding:14px 28px" onclick="checkAns()">Check ✨</button>'+
-      '</div>'+
-      '<p id="wrongTxt" style="display:none;color:#ff9999;font-size:14px;margin-top:12px;text-align:center">Hmm, not quite! Try again, baby 😘</p>'+
-      '<p id="hintLnk" style="color:rgba(255,255,255,.4);font-size:13px;margin-top:16px;text-align:center;cursor:pointer;text-decoration:underline" onclick="showHint()">Need a hint? 👀</p>'+
-      '<div id="hintBx" style="display:none;margin-top:14px;padding:14px 18px;background:rgba(144,238,144,.08);border-radius:12px;border:1px solid rgba(144,238,144,.15)">'+
-        '<p style="color:#90EE90;font-size:14px;margin:0">💡 '+s.hint+'</p>'+
-      '</div>'+
-    '</div>'+
-
-    '<div id="phSolved" style="display:none;text-align:center">'+
-      '<div style="font-size:50px;margin:10px 0;animation:scaleIn .6s ease">🎉</div>'+
-      '<p style="font-size:17px;color:#90EE90;line-height:1.8;margin:14px 0 26px;font-weight:600">'+s.success+'</p>'+
-      '<button class="btn-main" onclick="goNext()">'+nextLabel+'</button>'+
-    '</div>';
-
-  drawProgress();
-}
-
-function beginGame(){ curStop=0; showOnly('scrGame'); renderStop(); }
-
-function toRiddle(){
-  document.getElementById('phStory').style.display='none';
-  document.getElementById('phRiddle').style.display='block';
-  var inp=document.getElementById('ansInp');
-  if(inp) setTimeout(function(){inp.focus();},200);
-}
-
-function checkAns(){
-  var inp=document.getElementById('ansInp');
-  var g=inp.value.trim().toLowerCase();
-  if(!g) return;
-  var s=STOPS[curStop], ok=false;
-  for(var i=0;i<s.answers.length;i++){ if(g.indexOf(s.answers[i])!==-1){ok=true;break;} }
-  if(ok){
-    document.getElementById('phRiddle').style.display='none';
-    document.getElementById('phSolved').style.display='block';
-  } else {
-    inp.style.borderColor='#ff6b6b';
-    inp.style.animation='shake .5s ease';
-    document.getElementById('wrongTxt').style.display='block';
-    setTimeout(function(){inp.style.borderColor='rgba(255,255,255,.2)';inp.style.animation='none';},800);
+function go(action){
+  if(action==='start'){
+    state.screen='game';state.stop=0;state.phase='story';state.hintOn=false;state.wrongOn=false;
+    render();
+  }
+  else if(action==='riddle'){
+    state.phase='riddle';state.hintOn=false;state.wrongOn=false;
+    render();
+  }
+  else if(action==='hint'){
+    state.hintOn=true;
+    // Save current input value before re-render
+    var inp=document.getElementById('ansInp');
+    var val=inp?inp.value:'';
+    render();
+    var inp2=document.getElementById('ansInp');
+    if(inp2) inp2.value=val;
+  }
+  else if(action==='check'){
+    var inp=document.getElementById('ansInp');
+    var g=inp?inp.value.trim().toLowerCase():'';
+    if(!g) return;
+    var s=DATA[state.stop],ok=false;
+    for(var i=0;i<s.ans.length;i++){if(g.indexOf(s.ans[i])!==-1){ok=true;break;}}
+    if(ok){
+      state.phase='solved';
+      render();
+    } else {
+      state.wrongOn=true;
+      var val=inp.value;
+      render();
+      var inp2=document.getElementById('ansInp');
+      if(inp2){inp2.value=val;inp2.style.borderColor='#ff6b6b';inp2.style.animation='shake .5s ease';
+        setTimeout(function(){if(inp2){inp2.style.borderColor='rgba(255,255,255,.2)';inp2.style.animation='none';}},800);
+      }
+    }
+  }
+  else if(action==='next'){
+    if(state.stop<DATA.length-1){
+      state.stop++;state.phase='story';state.hintOn=false;state.wrongOn=false;
+      render();
+    } else {
+      state.screen='proposal';
+      render();
+    }
   }
 }
 
-function showHint(){
-  document.getElementById('hintLnk').style.display='none';
-  document.getElementById('hintBx').style.display='block';
-}
-
-function goNext(){
-  if(curStop<STOPS.length-1){ curStop++; renderStop(); window.scrollTo(0,0); }
-  else { showProposal(); }
-}
-
+// Enter key
 document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'){var inp=document.getElementById('ansInp');if(inp&&document.activeElement===inp)checkAns();}
+  if(e.key==='Enter'&&state.phase==='riddle'){
+    var inp=document.getElementById('ansInp');
+    if(inp&&document.activeElement===inp) go('check');
+  }
 });
 
-function showProposal(){
-  showOnly('scrProposal');
-  var cb=document.getElementById('confettiBox');cb.innerHTML='';
-  var cols=['#7EC8E3','#90EE90','#FFD700','#FF69B4','#E0F7FA','#C8E6C9','#FFF9C4','#F8BBD0'];
-  for(var i=0;i<80;i++){
-    var p=document.createElement('div');p.className='conf-piece';
-    p.style.left=(Math.random()*100)+'%';
-    p.style.width=(6+Math.random()*8)+'px';
-    p.style.height=(9+Math.random()*12)+'px';
-    p.style.backgroundColor=cols[i%cols.length];
-    p.style.transform='rotate('+(Math.random()*360)+'deg)';
-    p.style.animation='confettiFall '+(2+Math.random()*3)+'s ease-in '+(Math.random()*3)+'s infinite';
-    cb.appendChild(p);
-  }
-  var pc=document.getElementById('proposalContent');
-  pc.innerHTML=
-    '<p id="pL0" style="font-family:Playfair Display,serif;font-size:clamp(16px,3.5vw,22px);color:rgba(255,255,255,.85);line-height:1.8;max-width:580px;margin-bottom:16px;opacity:0;transition:all 1s ease">From that September morning in Rajahmundry...</p>'+
-    '<p id="pL1" style="font-family:Playfair Display,serif;font-size:clamp(16px,3.5vw,22px);color:rgba(255,255,255,.85);line-height:1.8;max-width:580px;margin-bottom:16px;opacity:0;transition:all 1s ease">To every stolen moment, every laugh, every look...</p>'+
-    '<p id="pL2" style="font-family:Playfair Display,serif;font-size:clamp(16px,3.5vw,22px);color:rgba(255,255,255,.85);line-height:1.8;max-width:580px;margin-bottom:16px;opacity:0;transition:all 1s ease">You became my favorite person in the universe.</p>'+
-    '<div id="bigR" style="opacity:0;transform:scale(.8);transition:all 1.2s ease;margin-top:24px">'+
-      '<div style="font-size:70px;margin-bottom:20px;animation:pulse 1.5s ease-in-out infinite">💍</div>'+
-      '<h1 class="big-proposal">Lipi, Will You Marry Me?</h1>'+
-      '<p style="font-size:clamp(15px,3vw,19px);color:rgba(255,255,255,.7);margin-top:18px;line-height:1.7;max-width:480px">You are my September surprise, my October warmth,<br>my November forever, and my every day after.</p>'+
-      '<p style="margin-top:40px;font-size:22px;color:#FFD700;font-weight:700;animation:pulse 2s ease-in-out infinite">Happy Valentine\'s Day, My Love! 💚</p>'+
-      '<p style="margin-top:30px;font-size:14px;color:rgba(255,255,255,.35);font-style:italic">Forever yours — Abhi 💚</p>'+
-    '</div>';
-  setTimeout(function(){document.getElementById('pL0').style.opacity='1';},500);
-  setTimeout(function(){document.getElementById('pL1').style.opacity='1';},2500);
-  setTimeout(function(){document.getElementById('pL2').style.opacity='1';},4500);
-  setTimeout(function(){var r=document.getElementById('bigR');r.style.opacity='1';r.style.transform='scale(1)';},7000);
-}
+// Initial render
+render();
 </script>
 
 </body>
