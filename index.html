@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Special Adventure for Lipi 💚</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💚</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a1a2e 0%, #0d2818 35%, #0a1a2e 65%, #0d2818 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    overflow-x: hidden;
+    font-family: 'Quicksand', sans-serif;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  @keyframes shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes bounceIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+  input::placeholder { color: rgba(255,255,255,0.3); }
+
+.hearts-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.heart {
+position: absolute;
+bottom: -30px;
+}
+.confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 100; overflow: hidden; }
+.confetti-piece {
+position: absolute;
+top: -20px;
+border-radius: 2px;
+}
+
+.screen {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-align: center;
+padding: 30px 20px;
+position: relative;
+z-index: 1;
+}
+.screen.hidden { display: none; }
+
+.shimmer-text {
+font-family: ‘Playfair Display’, serif;
+font-weight: 700;
+background: linear-gradient(135deg, #7EC8E3, #90EE90, #7EC8E3);
+background-size: 200% auto;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+animation: shimmer 3s linear infinite;
+}
+
+.btn {
+font-family: ‘Quicksand’, sans-serif;
+font-size: 16px;
+font-weight: 700;
+padding: 14px 36px;
+border-radius: 50px;
+border: none;
+background: linear-gradient(135deg, #7EC8E3, #90EE90);
+color: #1a3a2a;
+cursor: pointer;
+box-shadow: 0 4px 25px rgba(126,200,227,0.4);
+transition: all 0.3s ease;
+letter-spacing: 0.5px;
+}
+.btn:hover { transform: scale(1.05); box-shadow: 0 6px 35px rgba(126,200,227,0.6); }
+.btn:active { transform: scale(0.98); }
+
+.card {
+background: rgba(255,255,255,0.06);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border-radius: 24px;
+padding: clamp(24px, 5vw, 40px);
+max-width: 560px;
+width: 100%;
+border: 1px solid rgba(255,255,255,0.1);
+box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+}
+
+.riddle-box {
+background: rgba(126,200,227,0.08);
+border-radius: 16px;
+padding: 24px;
+margin: 16px 0 24px;
+border: 1px solid rgba(126,200,227,0.15);
+}
+
+.answer-input {
+flex: 1;
+min-width: 180px;
+font-family: ‘Quicksand’, sans-serif;
+font-size: 16px;
+padding: 14px 20px;
+border-radius: 50px;
+border: 2px solid rgba(255,255,255,0.15);
+background: rgba(255,255,255,0.08);
+color: #fff;
+outline: none;
+transition: all 0.3s ease;
+}
+.answer-input:focus { border-color: rgba(126,200,227,0.5); }
+.answer-input.wrong { border-color: #ff6b6b; animation: shake 0.5s ease; }
+
+.hint-box {
+margin-top: 16px;
+padding: 14px 18px;
+background: rgba(144,238,144,0.08);
+border-radius: 12px;
+border: 1px solid rgba(144,238,144,0.15);
+animation: fadeIn 0.4s ease;
+}
+
+.progress-bar {
+display: flex;
+align-items: center;
+gap: 8px;
+justify-content: center;
+margin: 20px 0 30px;
+}
+.progress-dot {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 16px;
+font-weight: 700;
+transition: all 0.5s ease;
+}
+.progress-dot.done {
+background: linear-gradient(135deg, #7EC8E3, #90EE90);
+color: #1a5c3a;
+box-shadow: 0 2px 10px rgba(126,200,227,0.4);
+}
+.progress-dot.current {
+background: #fff;
+color: #1a5c3a;
+border: 2px solid #90EE90;
+}
+.progress-dot.future {
+background: rgba(255,255,255,0.2);
+color: rgba(255,255,255,0.5);
+}
+.progress-line {
+width: 30px;
+height: 3px;
+border-radius: 2px;
+transition: all 0.5s ease;
+}
+.progress-line.done { background: linear-gradient(90deg, #7EC8E3, #90EE90); }
+.progress-line.future { background: rgba(255,255,255,0.15); }
+
+.proposal-line {
+font-family: ‘Playfair Display’, serif;
+font-size: clamp(16px, 3.5vw, 22px);
+color: rgba(255,255,255,0.85);
+line-height: 1.8;
+max-width: 600px;
+margin-bottom: 16px;
+opacity: 0;
+transform: translateY(20px);
+transition: all 1s ease;
+}
+.proposal-line.visible { opacity: 1; transform: translateY(0); }
+
+.big-question {
+font-family: ‘Playfair Display’, serif;
+font-size: clamp(32px, 7vw, 56px);
+font-weight: 700;
+background: linear-gradient(135deg, #7EC8E3, #90EE90, #FFD700, #90EE90, #7EC8E3);
+background-size: 300% auto;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+animation: shimmer 3s linear infinite;
+line-height: 1.2;
+margin-bottom: 12px;
+}
+
+.fade-in { animation: fadeIn 0.6s ease; }
+.scale-in { animation: scaleIn 1s ease; }
+.bounce-in { animation: bounceIn 0.6s ease; }
+</style>
+
+</head>
+<body>
+
+<!-- FLOATING HEARTS -->
+
+<div class="hearts-container" id="hearts"></div>
+
+<!-- WELCOME SCREEN -->
+
+<div class="screen" id="welcome-screen">
+  <div style="font-size:60px; margin-bottom:20px; animation: pulse 2s ease-in-out infinite">💌</div>
+  <h1 class="shimmer-text" style="font-size:clamp(28px,6vw,48px); margin-bottom:12px; line-height:1.2">
+    Hey Lipi! 💚
+  </h1>
+  <p style="font-size:clamp(16px,3vw,20px); color:rgba(255,255,255,0.85); max-width:500px; line-height:1.7; margin-bottom:8px">
+    I've hidden something special for you in this little adventure...
+  </p>
+  <p style="font-size:clamp(14px,2.5vw,17px); color:rgba(255,255,255,0.6); max-width:450px; line-height:1.6; margin-bottom:35px">
+    Solve the riddles, relive our memories, and find the surprise waiting at the end. Are you ready? 🕵️‍♀️
+  </p>
+  <button class="btn" style="font-size:18px; padding:16px 48px; letter-spacing:1px" onclick="startGame()">
+    Begin Our Adventure ✨
+  </button>
+  <p style="margin-top:40px; font-size:13px; color:rgba(255,255,255,0.35); font-style:italic">
+    Made with all my love — Abhi 💚
+  </p>
+</div>
+
+<!-- STOP SCREEN -->
+
+<div class="screen hidden" id="stop-screen">
+  <div class="progress-bar" id="progress-bar"></div>
+  <div class="card">
+    <div style="text-align:center; margin-bottom:20px">
+      <span id="stop-emoji" style="font-size:40px"></span>
+      <h2 id="stop-title" style="font-family:'Playfair Display',serif; font-size:clamp(22px,4vw,30px); font-weight:700; color:#fff; margin:10px 0 4px"></h2>
+      <p id="stop-date" style="font-size:14px; color:#90EE90; font-weight:600"></p>
+    </div>
+
+```
+<!-- Story Phase -->
+<div id="story-phase" class="fade-in">
+  <p id="stop-story" style="font-size:16px; color:rgba(255,255,255,0.8); line-height:1.8; text-align:center; font-style:italic; margin:20px 0 30px"></p>
+  <div style="text-align:center">
+    <button class="btn" onclick="showRiddle()">Show Me The Riddle! 🔍</button>
+  </div>
+</div>
+
+<!-- Riddle Phase -->
+<div id="riddle-phase" class="hidden fade-in">
+  <div class="riddle-box">
+    <p style="font-size:13px; color:#7EC8E3; font-weight:700; margin-bottom:12px; letter-spacing:2px">🧩 RIDDLE</p>
+    <p id="riddle-text" style="font-family:'Playfair Display',serif; font-size:clamp(15px,3vw,18px); color:rgba(255,255,255,0.9); line-height:1.9; white-space:pre-line"></p>
+  </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap">
+    <input type="text" id="answer-input" class="answer-input" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')checkAnswer()">
+    <button class="btn" style="padding:14px 28px" onclick="checkAnswer()">Check ✨</button>
+  </div>
+  <p id="wrong-msg" class="hidden" style="color:#ff9999; font-size:14px; margin-top:12px; text-align:center">
+    Hmm, not quite! Try again, baby 😘
+  </p>
+  <p id="hint-link" style="color:rgba(255,255,255,0.4); font-size:13px; margin-top:16px; text-align:center; cursor:pointer; text-decoration:underline" onclick="showHint()">
+    Need a hint? 👀
+  </p>
+  <div id="hint-box" class="hint-box hidden">
+    <p id="hint-text" style="color:#90EE90; font-size:14px; margin:0"></p>
+  </div>
+</div>
+
+<!-- Solved Phase -->
+<div id="solved-phase" class="hidden fade-in" style="text-align:center">
+  <div style="font-size:50px; margin:10px 0" class="bounce-in">🎉</div>
+  <p id="success-msg" style="font-size:17px; color:#90EE90; line-height:1.8; margin:16px 0 28px; font-weight:600"></p>
+  <button id="next-btn" class="btn" onclick="nextStop()"></button>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- PROPOSAL SCREEN -->
+
+<div class="screen hidden" id="proposal-screen">
+  <div class="confetti-container" id="confetti"></div>
+  <p class="proposal-line" id="line0">From that September morning in Rajahmundry...</p>
+  <p class="proposal-line" id="line1">To every stolen moment, every laugh, every look...</p>
+  <p class="proposal-line" id="line2">You became my favorite person in the universe.</p>
+  <div id="big-reveal" style="opacity:0; transform:scale(0.8); transition:all 1s ease; margin-top:20px">
+    <div style="font-size:70px; margin-bottom:20px; animation: pulse 1.5s ease-in-out infinite">💍</div>
+    <h1 class="big-question">Lipi, Will You Marry Me?</h1>
+    <p style="font-size:clamp(15px,3vw,19px); color:rgba(255,255,255,0.7); margin-top:16px; line-height:1.7; max-width:500px">
+      You are my September surprise, my October warmth,<br>my November forever, and my every day after.
+    </p>
+    <p style="margin-top:40px; font-size:22px; color:#FFD700; font-weight:700; animation: pulse 2s ease-in-out infinite">
+      Happy Valentine's Day, My Love! 💚
+    </p>
+    <p style="margin-top:30px; font-size:14px; color:rgba(255,255,255,0.35); font-style:italic">
+      Forever yours — Abhi 💚
+    </p>
+  </div>
+</div>
+
+<script>
+const STOPS = [
+  {
+    id: 1, emoji: "🌅", title: "Where It All Began", date: "September 28 • 10:00 AM",
+    story: "Every love story has a beginning. Ours started in a city blessed by the mighty Godavari, on a September morning when the universe decided two hearts should meet...",
+    riddle: "In a city where the Godavari flows wide,\nOn a September morning, our paths first collided.\nThe clock struck ten, the 28th day —\nName the city where our love story began to play! 🌊",
+    answers: ["rajahmundry", "rajamahendravaram", "rajamundry", "rajamahendri"],
+    hint: "💡 It's a beautiful city in Andhra Pradesh, famous for its bridge over the Godavari river...",
+    success: "Yes! 💚 Rajahmundry! That magical morning changed everything. Who knew 10 AM could be the most important time of my life?"
+  },
+  {
+    id: 2, emoji: "🏠", title: "Our Little World", date: "October 29",
+    story: "Sometimes the most precious moments don't happen at fancy places. They happen in quiet spaces, where it's just you and me, and the world fades away...",
+    riddle: "No restaurant, no park in sight,\nJust us together — everything felt right.\nOctober 29th, behind a familiar door,\nA private world where our hearts began to soar.\n\nWhat was this cozy place where we made memories so dear? 🔑",
+    answers: ["home", "your home", "house", "your house"],
+    hint: "💡 Think of the coziest, most private place... where only we existed that day 💕",
+    success: "That's right! 🏠 Your home became OUR little universe that day. Just us, no distractions — pure magic. That's when I knew this was real."
+  },
+  {
+    id: 3, emoji: "🍽️", title: "Our First Real Date", date: "November 5",
+    story: "After weeks of stolen glances and butterflies, we finally made it official — our first proper date! I remember every detail like it was yesterday...",
+    riddle: "November the fifth, hearts beating fast,\nOur first official date — a memory to last!\nA place whose name sounds like 'shelter' with a twist,\nA hotel where our love couldn't be missed.\n\nWhere did we share that special evening? 🌟",
+    answers: ["shelton", "shelton hotel", "hotel shelton", "the shelton"],
+    hint: "💡 It rhymes with 'melton'... and it's a hotel where we had our first date! 🏨",
+    success: "SHELTON HOTEL! 🎉 Our first official date! I was so nervous, but the moment I saw you, everything just clicked. Best. Date. Ever."
+  },
+  {
+    id: 4, emoji: "💍", title: "The Day We Said Forever", date: "November 8",
+    story: "From strangers in September to soulmates by November. In just 41 days, I found my forever person. And on November 8th, we made it official...",
+    riddle: "From the banks of Godavari to this very moment,\nEvery second with you has been golden.\nNovember 8th sealed what our hearts always knew —\n\nWhat happened on that beautiful day between me and you? 💎",
+    answers: ["engaged", "engagement", "we got engaged", "got engaged", "officially engaged", "propose", "proposal"],
+    hint: "💡 It's something that happens when two people decide to spend forever together... 💍",
+    success: "We got ENGAGED! 💍✨ The best decision of my life..."
+  }
+];
+
+let currentStop = 0;
+
+// Generate floating hearts
+function createHearts() {
+  const container = document.getElementById('hearts');
+  for (let i = 0; i < 20; i++) {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.fontSize = (10 + Math.random() * 20) + 'px';
+    heart.style.opacity = 0.3 + Math.random() * 0.5;
+    heart.style.animation = `floatUp ${3 + Math.random() * 4}s ease-in ${Math.random() * 5}s infinite`;
+    heart.textContent = '💚';
+    container.appendChild(heart);
+  }
+}
+
+function createConfetti() {
+  const container = document.getElementById('confetti');
+  const colors = ['#7EC8E3','#90EE90','#FFD700','#FF69B4','#E0F7FA','#C8E6C9','#FFF9C4','#F8BBD0'];
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (9 + Math.random() * 12) + 'px';
+    piece.style.backgroundColor = colors[i % colors.length];
+    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+    piece.style.animation = `confettiFall ${2 + Math.random() * 3}s ease-in ${Math.random() * 3}s infinite`;
+    container.appendChild(piece);
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function startGame() {
+  currentStop = 0;
+  showScreen('stop-screen');
+  loadStop();
+}
+
+function loadStop() {
+  const stop = STOPS[currentStop];
+  document.getElementById('stop-emoji').textContent = stop.emoji;
+  document.getElementById('stop-title').textContent = `Stop ${stop.id}: ${stop.title}`;
+  document.getElementById('stop-date').textContent = stop.date;
+  document.getElementById('stop-story').textContent = stop.story;
+  document.getElementById('riddle-text').textContent = stop.riddle;
+  document.getElementById('hint-text').textContent = stop.hint;
+  document.getElementById('success-msg').textContent = stop.success;
+  document.getElementById('next-btn').textContent = currentStop < STOPS.length - 1 ? 'Next Stop →' : "See What's Next... 💍";
+
+  document.getElementById('story-phase').classList.remove('hidden');
+  document.getElementById('riddle-phase').classList.add('hidden');
+  document.getElementById('solved-phase').classList.add('hidden');
+  document.getElementById('wrong-msg').classList.add('hidden');
+  document.getElementById('hint-link').classList.remove('hidden');
+  document.getElementById('hint-box').classList.add('hidden');
+  document.getElementById('answer-input').value = '';
+  document.getElementById('answer-input').classList.remove('wrong');
+
+  renderProgress();
+}
+
+function renderProgress() {
+  const bar = document.getElementById('progress-bar');
+  bar.innerHTML = '';
+  STOPS.forEach((stop, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot ' + (i < currentStop ? 'done' : i === currentStop ? 'current' : 'future');
+    dot.textContent = i < currentStop ? '✓' : stop.emoji;
+    bar.appendChild(dot);
+    if (i < STOPS.length - 1) {
+      const line = document.createElement('div');
+      line.className = 'progress-line ' + (i < currentStop ? 'done' : 'future');
+      bar.appendChild(line);
+    }
+  });
+}
+
+function showRiddle() {
+  document.getElementById('story-phase').classList.add('hidden');
+  document.getElementById('riddle-phase').classList.remove('hidden');
+  setTimeout(() => document.getElementById('answer-input').focus(), 300);
+}
+
+function checkAnswer() {
+  const input = document.getElementById('answer-input');
+  const guess = input.value.trim().toLowerCase();
+  const stop = STOPS[currentStop];
+
+  if (stop.answers.some(a => guess.includes(a))) {
+    document.getElementById('riddle-phase').classList.add('hidden');
+    document.getElementById('solved-phase').classList.remove('hidden');
+  } else {
+    input.classList.add('wrong');
+    document.getElementById('wrong-msg').classList.remove('hidden');
+    setTimeout(() => {
+      input.classList.remove('wrong');
+    }, 800);
+  }
+}
+
+function showHint() {
+  document.getElementById('hint-link').classList.add('hidden');
+  document.getElementById('hint-box').classList.remove('hidden');
+}
+
+function nextStop() {
+  if (currentStop < STOPS.length - 1) {
+    currentStop++;
+    loadStop();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    showProposal();
+  }
+}
+
+function showProposal() {
+  showScreen('proposal-screen');
+  createConfetti();
+
+  setTimeout(() => document.getElementById('line0').classList.add('visible'), 500);
+  setTimeout(() => document.getElementById('line1').classList.add('visible'), 2500);
+  setTimeout(() => document.getElementById('line2').classList.add('visible'), 4500);
+  setTimeout(() => {
+    const reveal = document.getElementById('big-reveal');
+    reveal.style.opacity = '1';
+    reveal.style.transform = 'scale(1)';
+  }, 7000);
+}
+
+// Init
+createHearts();
+</script>
+
+</body>
+</html>
